@@ -1,8 +1,7 @@
-<<<<<<< HEAD
-pair-tomato
+tomatosauce
 ===========
 
-A new interpretation of a time management technique named after a kitchen timer
+The node.js part of pair-tomato: A new interpretation of a time management technique named after a kitchen timer
 
 
 
@@ -17,7 +16,3 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-=======
-tomatosauce
-===========
->>>>>>> 39c98598753719fc4ec1cb87c6d7b85ff8e864b6

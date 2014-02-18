@@ -239,6 +239,8 @@ RPA.prototype.checkOutcome = function () {
 var rpa = new RPA();
 rpa.connectToArduino();
 
+// Via this website
+// http://stackoverflow.com/questions/10594751/node-js-intercepting-process-exit
 process.on('SIGINT', function() {
     console.log('Received Signal to exit program');
 

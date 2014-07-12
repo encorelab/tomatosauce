@@ -21,7 +21,7 @@ var exec = require('child_process').exec;
 // grab information from user
 var argv = require('optimist')
   .usage('Usage:\n\t$0 username')
-  .demand(1)
+  .demand(0)
   .argv;
 
 var username = argv._[0];
@@ -62,8 +62,6 @@ function RPA () {
 
   this.yourWeapon = undefined;
   this.theirWeapon = undefined;
-
-  this.initModels();
 }
 util.inherits(RPA, events.EventEmitter2);
 
@@ -72,9 +70,9 @@ RPA.Arduino = require('./tomato.arduino').Arduino;
 
 
 RPA.prototype.initModels = function () {
-  // Wakeful connection via EvoRoom.Model that allows to receive change triggers 
-  PP.Model.init(config.drowsy.url, config.database).done(function () {
-    PP.Model.initWakefulCollections(config.wakeful.url).done(function() {
+  // Wakeful connection via EvoRoom.Model that allows to receive change triggers
+  PP.Model.init(config.drowsy.url, config.database).then(function () {
+    PP.Model.initWakefulCollections(config.wakeful.url).then(function() {
       // grab awake contributions collection
       // var contributions = PP.Model.awake.contributions;
       // console.log('We have '+contributions.length+' contributions ...');
@@ -99,7 +97,7 @@ RPA.prototype.initModels = function () {
       // // register change and add events to trigger function assigning tag bucket items
       states.on('change add', function (state){
         console.log('Change of state object');
-        console.log(state);
+        // console.log(state);
       });
 
       // // when starting up check all state object if any of them requires the agent to perfom an action
@@ -126,8 +124,10 @@ RPA.prototype.connectToArduino = function () {
     .on('online', function () {
       log("Arduino is online");
     })
-    .on('present', function () {
-      log("You are now present");
+    .on('tomato_present', function (data) {
+      log("Your tomato is now present and ready for a session");
+
+      user_state = rpa.retrieveUserStateForRfidId(data);
 
       user_state.set('presence', 'present');
       user_state.save();
@@ -154,11 +154,8 @@ RPA.prototype.connectToArduino = function () {
       //   rpa.arduino.writeEvent('you_are_absent');
       // }
     })
-    .on('you_choose', function (weapon) {
-      rpa.yourWeapon = weapon;
-      // rpa.chat.sendEvent('choice', weapon);
-      rpa.arduino.writeEvent('you_choose_weapon', weapon[0]);
-      rpa.checkOutcome();
+    .on('abort_tomato', function () {
+      log("You are aborting the tomato session for everyone :/");
     });
 
 
@@ -213,30 +210,41 @@ RPA.prototype.connectToArduino = function () {
 //   this.chat.connect();
 // };
 
-RPA.prototype.checkOutcome = function () {
-  if (this.yourWeapon && this.theirWeapon) {
-    if (this.yourWeapon === this.theirWeapon) {
-      this.arduino.writeEvent('tie');
-    } else if (this.yourWeapon === "Rock" && this.theirWeapon === "Scissors" ||
-        this.yourWeapon === "Paper" && this.theirWeapon === "Rock" ||
-        this.yourWeapon === "Scissors" && this.theirWeapon === "Paper") {
-      this.arduino.writeEvent('you_win');
-      this.winCount++;
-    } else {
-      this.arduino.writeEvent('you_lose');
-      this.loseCount++;
-    }
+// RPA.prototype.checkOutcome = function () {
+//   if (this.yourWeapon && this.theirWeapon) {
+//     if (this.yourWeapon === this.theirWeapon) {
+//       this.arduino.writeEvent('tie');
+//     } else if (this.yourWeapon === "Rock" && this.theirWeapon === "Scissors" ||
+//         this.yourWeapon === "Paper" && this.theirWeapon === "Rock" ||
+//         this.yourWeapon === "Scissors" && this.theirWeapon === "Paper") {
+//       this.arduino.writeEvent('you_win');
+//       this.winCount++;
+//     } else {
+//       this.arduino.writeEvent('you_lose');
+//       this.loseCount++;
+//     }
 
-    this.yourWeapon = undefined;
-    this.theirWeapon = undefined;
+//     this.yourWeapon = undefined;
+//     this.theirWeapon = undefined;
 
-    // TODO: should we really do this?
-    rpa.arduino.writeEvent('you_are_present');
-    rpa.arduino.writeEvent('opponent_is_present');
+//     // TODO: should we really do this?
+//     rpa.arduino.writeEvent('you_are_present');
+//     rpa.arduino.writeEvent('opponent_is_present');
+//   }
+// };
+
+RPA.prototype.retrieveUserStateForRfidId = function (rfid_id) {
+  user_state = states.findWhere({'rfid_id': rfid_id});
+
+  if (user_state) {
+    return user_state;
+  } else {
+    return new Error("Unable to find user state object for rfid ID "+rfid_id);
   }
 };
 
 var rpa = new RPA();
+rpa.initModels();
 rpa.connectToArduino();
 
 // Via this website

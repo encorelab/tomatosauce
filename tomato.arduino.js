@@ -48,7 +48,7 @@ Arduino.prototype.detectSerialport = function () {
 Arduino.prototype.openSerialport = function () {
   this.serialport = new serialport.SerialPort(this.serialportDev, {
     parser: serialport.parsers.readline("\r\n")
-  });  
+  });
   this.bindInputProcessor();
 };
 
@@ -80,8 +80,9 @@ Arduino.prototype.writeToSerialport = function(data) {
 
 Arduino.prototype.processInput = function (input) {
   console.log(color.blackBright("<< [FROM ARDUINO]"), util.inspect(input, true, null, true));
-  
+  console.log(input);
   var c = input.split(" ");
+  console.log(c);
   var ctrl = c[0];
   var ev = c[1];
   var arg = c[2];
@@ -100,7 +101,7 @@ Arduino.prototype.processInput = function (input) {
   // case '~':
   //   rpa.enterDojo();
   //   break;
-  // case 'n': 
+  // case 'n':
   //   rpa.bow();
   //   break;
   // case 'r':
